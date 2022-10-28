@@ -46,7 +46,7 @@ bool verifyXDirection(const Mat &mat) {
     bool findLeft = false, findRight = false;
     while (true) {
         offset++;
-        if (centerX - offset <= 0 || centerX + offset >= width + 1) {
+        if ((centerX - offset) <= 0 || (centerX + offset) >= (width - 1)) {
             break;
         }
         //左边
@@ -71,6 +71,14 @@ bool verifyXDirection(const Mat &mat) {
     }
     centerBlack = end - start;
     //左右中间的白色
+    //右边
+    for (int col = end; col < width - 1; col++) {
+        pixels = mat.at<uchar>(centerY, col);
+        if (pixels == 0) {
+            break;
+        }
+        rightWhite++;
+    }
     //左边
     for (int col = start; col > 0; col--) {
         pixels = mat.at<uchar>(centerY, col);
@@ -79,46 +87,48 @@ bool verifyXDirection(const Mat &mat) {
         }
         leftWhite++;
     }
-    //右边
-    for (int col = end; col > width - 1; col++) {
-        pixels = mat.at<uchar>(centerY, col);
-        if (pixels == 0) {
-            break;
-        }
-        rightWhite++;
+
+    if (leftWhite == 0 || rightWhite == 0) {
+        return false;
     }
-    if (leftWhite == 0 || rightWhite == 0) return false;
 
     //两边黑色
+    for (int col = end + rightWhite; col < width - 1; col++) {
+        pixels = mat.at<uchar>(centerY, col);
+        if (pixels == 255){
+            break;
+        }
+        rightBlack++;
+    }
+
     for (int col = start - leftWhite; col > 0; col--) {
         pixels = mat.at<uchar>(centerY, col);
-        if (pixels == 255)break;
+        if (pixels == 255){
+            break;
+        }
         leftBlack++;
     }
 
-    for (int col = end + rightWhite; col < width - 1; col++) {
-        pixels = mat.at<uchar>(centerY, col);
-        if (pixels == 255)break;
-        rightBlack++;
+
+    if (leftBlack == 0 || rightBlack == 0){
+        return false;
     }
-    if (leftBlack == 0 || rightBlack == 0) return false;
-    int sum = centerBlack + leftWhite + rightWhite + leftBlack + rightBlack;
+
+    float sum = centerBlack + leftWhite + rightWhite + leftBlack + rightBlack;
     centerBlack = (centerBlack / sum) * 7 + 0.5;
-    leftWhite = (centerBlack / sum) * 7 + 0.5;
-    leftBlack = (centerBlack / sum) * 7 + 0.5;
-    rightWhite = (centerBlack / sum) * 7 + 0.5;
-    rightBlack = (centerBlack / sum) * 7 + 0.5;
-    if ((centerBlack==3||centerBlack==4) && (leftBlack==rightBlack) && (leftWhite==rightWhite) && (leftWhite==leftBlack) && (leftWhite==1)){
-        return true;
-    }
-    return false;
+    leftWhite = (leftWhite / sum) * 7 + 0.5;
+    leftBlack = (leftBlack / sum) * 7 + 0.5;
+    rightWhite = (rightWhite / sum) * 7 + 0.5;
+    rightBlack = (rightBlack / sum) * 7 + 0.5;
+    return (centerBlack == 3 || centerBlack == 4) && (leftBlack == rightBlack) &&
+           (leftWhite == rightWhite) && (leftWhite == leftBlack) && (leftWhite == 1);
 
 }
 
 extern "C"
 JNIEXPORT jboolean JNICALL
 Java_com_code_detection_QRCodeUtils_isContainQRCode(JNIEnv *env, jobject thiz, jobject bitmap) {
-    bool isContain= false;
+    bool isContain = false;
     Mat src;
     BitmapMatUtils::bitmap2mat(env, bitmap, src);
     if (src.empty()) {
@@ -147,24 +157,14 @@ Java_com_code_detection_QRCodeUtils_isContainQRCode(JNIEnv *env, jobject thiz, j
         float ratio = min(width, height) / max(width, height);
         if (ratio > 0.9 && width < gray.cols / 2 && height < gray.rows / 2) {
             Mat qrROI = wrapTransform(gray, mRect);
-            if (verifyXDirection(qrROI)){
+            if (verifyXDirection(qrROI)) {
                 drawContours(src, contours, i, Scalar(0, 0, 255), 4);
-                isContain= true;
+                isContain = true;
             }
         }
     }
-    if (isContain){
-        return 0;
-    }
-    return -1;
+
+    return isContain;
 
 }
 
-
-
-
-/*extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_code_detection_MainActivity_isContainQRCode(JNIEnv *env, jobject thiz, jobject bitmap) {
-
-}*/
