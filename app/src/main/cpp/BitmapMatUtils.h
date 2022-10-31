@@ -13,11 +13,11 @@ using namespace cv;
 
 class BitmapMatUtils {
 public:
-    static int bitmap2mat(JNIEnv *env,jobject &bitmap,Mat &map);
+    static int bitmap2mat(JNIEnv *env,jobject &bitmap,Mat &mat);
 
-    static int mat2bitmap(JNIEnv *env,Mat &map,jobject &bitmap);
+    static int mat2bitmap(JNIEnv *env,Mat &mat,jobject &bitmap);
 
-    static jobject createBitmap(JNIEnv *env,jint width,jint height,int type);
+    static jobject createBitmap(JNIEnv *env,jint width,jint height,char* type);
 };
 
 

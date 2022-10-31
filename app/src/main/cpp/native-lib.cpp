@@ -95,7 +95,7 @@ bool verifyXDirection(const Mat &mat) {
     //两边黑色
     for (int col = end + rightWhite; col < width - 1; col++) {
         pixels = mat.at<uchar>(centerY, col);
-        if (pixels == 255){
+        if (pixels == 255) {
             break;
         }
         rightBlack++;
@@ -103,14 +103,14 @@ bool verifyXDirection(const Mat &mat) {
 
     for (int col = start - leftWhite; col > 0; col--) {
         pixels = mat.at<uchar>(centerY, col);
-        if (pixels == 255){
+        if (pixels == 255) {
             break;
         }
         leftBlack++;
     }
 
 
-    if (leftBlack == 0 || rightBlack == 0){
+    if (leftBlack == 0 || rightBlack == 0) {
         return false;
     }
 
@@ -128,12 +128,12 @@ bool verifyXDirection(const Mat &mat) {
 extern "C"
 JNIEXPORT jboolean JNICALL
 Java_com_code_detection_QRCodeUtils_isContainQRCode(JNIEnv *env, jobject thiz, jobject bitmap) {
-    bool isContain = false;
+    int itemCounts = 0;
     Mat src;
     BitmapMatUtils::bitmap2mat(env, bitmap, src);
     if (src.empty()) {
         LOGE("src imread error");
-        return -1;
+        return itemCounts >= 3;
     }
     //对图像进行灰度处理
     Mat gray;
@@ -143,7 +143,7 @@ Java_com_code_detection_QRCodeUtils_isContainQRCode(JNIEnv *env, jobject thiz, j
     //寻找轮廓
     vector<vector<Point>> contours;
     findContours(gray, contours, RETR_LIST, CHAIN_APPROX_SIMPLE);
-
+    Scalar color = Scalar(0, 0, 255);
     //循环所有轮廓  进行筛选
     for (int i = 0; i < contours.size(); ++i) {
         double area = contourArea(contours[i]);
@@ -158,13 +158,20 @@ Java_com_code_detection_QRCodeUtils_isContainQRCode(JNIEnv *env, jobject thiz, j
         if (ratio > 0.9 && width < gray.cols / 2 && height < gray.rows / 2) {
             Mat qrROI = wrapTransform(gray, mRect);
             if (verifyXDirection(qrROI)) {
-                drawContours(src, contours, i, Scalar(0, 0, 255), 4);
-                isContain = true;
+                itemCounts++;
+                //drawContours(src, contours, i, Scalar(0, 255, 0), 4,LINE_4);
+
             }
         }
     }
 
-    return isContain;
 
+    /* bool isWrite = imwrite("/sdcard/opencv/code_1.png", src);
+     if (isWrite) {
+         LOGE("写入成功");
+     } else {
+         LOGE("写入失败");
+     }
+ */
+    return itemCounts >= 3;
 }
-

@@ -10,4 +10,7 @@ object QRCodeUtils {
 
     external fun isContainQRCode(bitmap: Bitmap): Boolean
 
+    external fun detectionQRCode(bitmap: Bitmap):Bitmap
+
+
 }

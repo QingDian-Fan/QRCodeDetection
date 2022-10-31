@@ -81,13 +81,13 @@ int BitmapMatUtils::mat2bitmap(JNIEnv *env, Mat &mat, jobject &bitmap) {
 }
 
 
-jobject BitmapMatUtils::createBitmap(JNIEnv *env, jint width, jint height, int type) {
+jobject BitmapMatUtils::createBitmap(JNIEnv *env, jint width, jint height, char* type) {
     const char *bitmap_config_class_name = "android/graphics/Bitmap$Config";
     jclass bitmap_config_class = env->FindClass(bitmap_config_class_name);
 
     jmethodID bitmap_config_mid = env->GetStaticMethodID(bitmap_config_class, "valueOf",
                                                          "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/Enum;");
-    jstring configName = env->NewStringUTF("ARGB_8888");
+    jstring configName = env->NewStringUTF(type);
     jobject bitmap_config = env->CallStaticObjectMethod(bitmap_config_class, bitmap_config_mid,
                                                         bitmap_config_class, configName);
 
