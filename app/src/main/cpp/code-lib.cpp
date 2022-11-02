@@ -171,8 +171,9 @@ Java_com_code_detection_QRCodeUtils_detectionQRCode(JNIEnv *env, jobject thiz, j
 
     }
     imwrite("/sdcard/opencv/code_1.png", mat);
-    BitmapMatUtils::mat2bitmap(env, mat, bitmap);
-    return bitmap;
+    jobject new_bitmap = BitmapMatUtils::createBitmap(env,mat.cols,mat.rows,"ARGB_8888");
+    BitmapMatUtils::mat2bitmap(env, mat, new_bitmap);
+    return new_bitmap;
 
 
 }

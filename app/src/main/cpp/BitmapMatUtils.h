@@ -18,6 +18,8 @@ public:
     static int mat2bitmap(JNIEnv *env,Mat &mat,jobject &bitmap);
 
     static jobject createBitmap(JNIEnv *env,jint width,jint height,char* type);
+
+    static jobject generateBitmap(JNIEnv *env, jint width, jint height);
 };
 
 

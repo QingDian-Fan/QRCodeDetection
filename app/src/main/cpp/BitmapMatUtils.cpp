@@ -94,7 +94,7 @@ jobject BitmapMatUtils::createBitmap(JNIEnv *env, jint width, jint height, char*
     const char *bitmap_class_name = "android/graphics/Bitmap";
     jclass bitmap_class = env->FindClass(bitmap_class_name);
     jmethodID create_bitmap_mid = env->GetStaticMethodID(bitmap_class, "createBitmap",
-                                                         "(IILandroid/graphics/Bitmap/Config;)Landroid/graphics/Bitmap;");
+                                                         "(IILandroid/graphics/Bitmap$Config;)Landroid/graphics/Bitmap;");
     jobject bitmap = env->CallStaticObjectMethod(bitmap_class, create_bitmap_mid, width, height,
                                                  bitmap_config);
     return bitmap;
